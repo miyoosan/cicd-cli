@@ -1,0 +1,91 @@
+# nginx进程数，通常设置成和cpu的数量相等
+worker_processes  1;
+
+# 全局错误日志定义类型
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+# 进程pid文件
+#pid        logs/nginx.pid;
+
+# 参考事件模型
+events {
+    # 单个进程最大连接数（最大连接数=连接数+进程数）
+    worker_connections  1024;
+}
+
+# 设定http服务器
+http {
+    # 文件扩展名与文件类型映射表
+    include       mime.types;
+    # 默认文件类型
+    default_type  application/octet-stream;
+    # 设定通过nginx上传文件的大小
+    client_max_body_size 2000M;
+
+    #日志格式设定
+    # $remote_addr与 $http_x_forwarded_for用以记录客户端的ip地址；
+    # $remote_user：用来记录客户端用户名称；
+    # $time_local： 用来记录访问时间与时区；
+    # $request： 用来记录请求的url与http协议；
+    # $status： 用来记录请求状态；成功是200，
+    # $body_bytes_sent ：记录发送给客户端文件主体内容大小；
+    # $http_referer：用来记录从那个页面链接访问过来的；
+    # $http_user_agent：记录客户浏览器的相关信息；
+    # log_format  main  '$remote_addr - $remote_user [$time_local] "$request" ' '$status $body_bytes_sent "$http_referer" ' '"$http_user_agent" "$http_x_forwarded_for"';
+
+   
+
+    # 长连接超时时间，单位是秒
+    keepalive_timeout  900;
+    send_timeout 900;
+    proxy_connect_timeout 900;
+    proxy_send_timeout 900;
+    proxy_read_timeout 900;
+
+    # 虚拟主机的配置
+    server {
+
+        listen    60001;
+        # 域名可以有多个，用空格隔开
+        server_name localhost;
+        # charset koi8-r;
+
+        # 定义本虚拟主机的访问日志
+        # 注意，在 Dockerfile 中创建 /admin-fe-access.log
+        # access_log logs/host.access.log main;
+
+        # gzip config
+        gzip on;
+        # 当返回内容大于此值时才会使用gzip进行压缩,以K为单位
+        gzip_min_length 1k;
+        # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间
+        gzip_comp_level 1;
+        # 设置需要压缩的MIME类型,如果不在设置类型范围内的请求不进行压缩
+        gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png application/vnd.ms-fontobject font/ttf font/opentype font/x-woff image/svg+xml;
+        # 增加响应头”Vary: Accept-Encoding”，告诉接收方发送的数据经过了压缩处理，开启后的效果是在响应头部添加了Accept-Encoding:gzip，这对于本身不支持gzip压缩的客户端浏览器有用
+        gzip_vary on;
+        # 禁用IE 6 gzip
+        gzip_disable "MSIE[1-6]\.";
+
+        location / {
+          root  /etc/nginx/html/;
+          index index.html index.htm index.php;
+          # 使用BrowerRouter必须要配置这个
+          try_files $uri /index.html;
+          if ($request_uri = "/") {
+            add_header Pragma no-cache;
+            add_header Cache-Control no-store;
+          }
+        }
+
+        location /api/ {
+          proxy_set_header   Forwarded  host=$host:$server_port;
+          #proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          #proxy_pass http://service-name.namespace.svc.cluster.local:port/;
+        }
+    }
+}
+

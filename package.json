@@ -1,0 +1,32 @@
+{
+  "name": "cicd-cli",
+  "version": "0.1.0",
+  "description": "cicd for kubernetes and jenkins",
+  "author": "miyoosan",
+  "main": "./bin/index.js",
+  "email": "miyo470375124@gmail.com",
+  "bin": {
+    "cicd": "./bin/index.js"
+  },
+  "dependencies": {
+    "archiver": "^3.1.1",
+    "chalk": "^3.0.0",
+    "commander": "^4.1.0",
+    "fs-extra": "^10.0.1",
+    "inquirer": "^7.0.3",
+    "ora": "^4.0.3",
+    "request": "^2.88.2",
+    "semver": "^7.1.1",
+    "xml2js": "^0.4.23"
+  },
+  "keywords": ["cicd", "kubernetes"],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miyoosan/cicd-cli"
+  },
+  "engines": {
+    "node": ">=16.7.0",
+    "npm": ">=7.20.0"
+  }
+}

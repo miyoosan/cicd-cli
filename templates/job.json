@@ -1,0 +1,125 @@
+{
+  "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject": {
+    "$": { "plugin": "workflow-multibranch@706.vd43c65dec013" },
+    "actions": "",
+    "description": "",
+    "displayName": "demo-test",
+    "properties": {
+      "org.jenkinsci.plugins.docker.workflow.declarative.FolderConfig": {
+        "$": { "plugin": "docker-workflow@1.27" },
+        "dockerLabel": "",
+        "registry": { "$": { "plugin": "docker-commons@1.18" } }
+      },
+      "org.csanchez.jenkins.plugins.kubernetes.KubernetesFolderProperty": {
+        "$": { "plugin": "kubernetes@1.30.11" },
+        "permittedClouds": ""
+      }
+    },
+    "folderViews": {
+      "$": {
+        "class": "jenkins.branch.MultiBranchProjectViewHolder",
+        "plugin": "branch-api@2.7.0"
+      },
+      "owner": {
+        "$": {
+          "class": "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+          "reference": "../.."
+        }
+      }
+    },
+    "healthMetrics": "",
+    "icon": {
+      "$": {
+        "class": "jenkins.branch.MetadataActionFolderIcon",
+        "plugin": "branch-api@2.7.0"
+      },
+      "owner": {
+        "$": {
+          "class": "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+          "reference": "../.."
+        }
+      }
+    },
+    "orphanedItemStrategy": {
+      "$": {
+        "class": "com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy",
+        "plugin": "cloudbees-folder@6.17"
+      },
+      "pruneDeadBranches": "true",
+      "daysToKeep": "-1",
+      "numToKeep": "-1"
+    },
+    "triggers": {
+      "com.igalg.jenkins.plugins.mswt.trigger.ComputedFolderWebHookTrigger": {
+        "$": { "plugin": "multibranch-scan-webhook-trigger@1.0.9" },
+        "spec": "",
+        "token": "demo-test"
+      }
+    },
+    "disabled": "false",
+    "sources": {
+      "$": {
+        "class": "jenkins.branch.MultiBranchProject$BranchSourceList",
+        "plugin": "branch-api@2.7.0"
+      },
+      "data": {
+        "jenkins.branch.BranchSource": {
+          "source": {
+            "$": { "class": "jenkins.plugins.git.GitSCMSource", "plugin": "git@4.8.3" },
+            "id": "",
+            "remote": "",
+            "credentialsId": "",
+            "traits": {
+              "jenkins.plugins.git.traits.BranchDiscoveryTrait": "",
+              "jenkins.scm.impl.trait.WildcardSCMHeadFilterTrait": {
+                "$": { "plugin": "scm-api@2.6.5" },
+                "includes": "dev master release",
+                "excludes": ""
+              }
+            }
+          },
+          "strategy": {
+            "$": { "class": "jenkins.branch.NamedExceptionsBranchPropertyStrategy" },
+            "defaultProperties": { "$": { "class": "empty-list" } },
+            "namedExceptions": {
+              "$": { "class": "java.util.Arrays$ArrayList" },
+              "a": {
+                "$": {
+                  "class": "jenkins.branch.NamedExceptionsBranchPropertyStrategy$Named-array"
+                },
+                "jenkins.branch.NamedExceptionsBranchPropertyStrategy_-Named": {
+                  "props": {
+                    "$": { "class": "java.util.Arrays$ArrayList" },
+                    "a": {
+                      "$": { "class": "jenkins.branch.BranchProperty-array" },
+                      "jenkins.branch.NoTriggerBranchProperty": ""
+                    }
+                  },
+                  "name": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "owner": {
+        "$": {
+          "class": "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+          "reference": "../.."
+        }
+      }
+    },
+    "factory": {
+      "$": {
+        "class": "org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory"
+      },
+      "owner": {
+        "$": {
+          "class": "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject",
+          "reference": "../.."
+        }
+      },
+      "scriptPath": "Jenkinsfile"
+    }
+  }
+}
