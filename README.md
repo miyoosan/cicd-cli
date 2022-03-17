@@ -4,7 +4,7 @@
 # install
 yarn global add vcicd-cli
 
-yarn --help
+cicd --help
 ----
 Usage:  [options] [command]
 
