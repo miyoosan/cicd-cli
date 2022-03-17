@@ -1,5 +1,5 @@
 {
-  "name": "cicd-cli",
+  "name": "vcicd-cli",
   "version": "0.1.0",
   "description": "cicd for kubernetes and jenkins",
   "author": "miyoosan",
