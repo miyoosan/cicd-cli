@@ -55,6 +55,16 @@ function checkNodeVersion(wanted, id) {
   }
 }
 
+// 检查必要的环境变量是否存在
+function checkEnvironmentVariables(env) {
+  const envVairables = ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN', 'GITLAB_CREDENTIALS_ID', 'JENKINS_URL', 'JENKINS_USERNAME', 'JENKINS_PASSWORD'];
+  const vacant = envVairables.filter(envKey => !env[envKey]);
+  if (vacant.length) {
+    errorLog(`配置错误！缺少环境变量: ${vacant.join(', ')}`);
+    process.exit(1);
+  }
+}
+
 // 检查配置是否符合特定schema
 function checkConfigScheme(configKey, configObj, privateKey) {
   let deploySchemaKeys = null;
@@ -118,5 +128,6 @@ module.exports = {
   errorLog,
   underlineLog,
   checkNodeVersion,
-  checkDeployConfig
+  checkDeployConfig,
+  checkEnvironmentVariables
 };

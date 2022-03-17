@@ -2,7 +2,7 @@
 
 const inquirer = require('inquirer');
 const packageJson = require('../package.json');
-const { checkNodeVersion, underlineLog, successLog, errorLog } = require('../utils/index');
+const { checkNodeVersion, checkEnvironmentVariables } = require('../utils/index');
 const execSync = require('child_process').execSync;
 const { genCIFiles, genJenkinsJob, genGitlabWebhook, genDingtalWebhook } = require('../lib/generate');
 
@@ -10,6 +10,8 @@ const version = packageJson.version;
 const requiredNodeVersion = packageJson.engines.node;
 
 checkNodeVersion(requiredNodeVersion, 'ci-cli');
+
+checkEnvironmentVariables(process.env);
 
 let gitlabUrl;
 try{
