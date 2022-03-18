@@ -3,6 +3,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const semver = require('semver');
+const execSync = require('child_process').execSync;
 
 const DEPLOY_SCHEMA = {
   name: '',
@@ -56,11 +57,34 @@ function checkNodeVersion(wanted, id) {
 }
 
 // 检查必要的环境变量是否存在
-function checkEnvironmentVariables(env) {
-  const envVairables = ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN', 'GITLAB_CREDENTIALS_ID', 'JENKINS_URL', 'JENKINS_USERNAME', 'JENKINS_PASSWORD'];
-  const vacant = envVairables.filter(envKey => !env[envKey]);
+function checkEnvironmentVariables(env, defaultEnvVariables) {
+  const envVariables = defaultEnvVariables || ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN', 'GITLAB_CREDENTIALS_ID', 'JENKINS_URL', 'JENKINS_USERNAME', 'JENKINS_PASSWORD'];
+  const vacant = envVariables.filter(envKey => !env[envKey]);
   if (vacant.length) {
     errorLog(`配置错误！缺少环境变量: ${vacant.join(', ')}`);
+    process.exit(1);
+  }
+}
+
+// 检测是否Git项目，是旧返回项目地址
+function checkGitConfig() {
+  let gitlabUrl;
+  try{
+      const remotes = execSync('git remote -v').toString().trim();
+      gitlabUrl = remotes.split('\t')[1].split(' ')[0];
+  } catch {}
+  return gitlabUrl;
+}
+
+// 检测分支是否是主干
+function checkMasterBranch() {
+  let branchName;
+  try {
+    const branchInfo = execSync('git branch -vv').toString().trim();
+    branchName = branchInfo.split('\n').filter(item => item[0] === '*').join('').slice(2, 8);
+  } catch{}
+  if(branchName === 'master') {
+    errorLog(`请不要在master分支执行此命令`);
     process.exit(1);
   }
 }
@@ -129,5 +153,7 @@ module.exports = {
   underlineLog,
   checkNodeVersion,
   checkDeployConfig,
-  checkEnvironmentVariables
+  checkEnvironmentVariables,
+  checkGitConfig,
+  checkMasterBranch
 };

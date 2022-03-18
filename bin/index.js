@@ -2,22 +2,13 @@
 
 const inquirer = require('inquirer');
 const packageJson = require('../package.json');
-const { checkNodeVersion, checkEnvironmentVariables } = require('../utils/index');
-const execSync = require('child_process').execSync;
-const { genCIFiles, genJenkinsJob, genGitlabWebhook, genDingtalWebhook } = require('../lib/generate');
+const { checkNodeVersion, checkEnvironmentVariables, checkGitConfig, checkMasterBranch, errorLog } = require('../utils/index');
+const { genCIFiles, genCDFiles, genJenkinsJob, genGitlabWebhook, genDingtalWebhook } = require('../lib/generate');
 
 const version = packageJson.version;
 const requiredNodeVersion = packageJson.engines.node;
 
 checkNodeVersion(requiredNodeVersion, 'ci-cli');
-
-checkEnvironmentVariables(process.env);
-
-let gitlabUrl;
-try{
-    const remotes = execSync('git remote -v').toString().trim();
-    gitlabUrl = remotes.split('\t')[1].split(' ')[0];
-} catch{}
 
 const program = require('commander');
 
@@ -27,6 +18,8 @@ program
     .command('jenkins')
     .description('创建Jenkins多分支流水线任务')
     .action(() => {
+        checkEnvironmentVariables(process.env);
+        const gitlabUrl = checkGitConfig();
         inquirer.prompt([
             {
                 type: 'input',
@@ -47,6 +40,8 @@ program
     .command('gitlab')
     .description('添加webhooks到gitlab仓库')
     .action(() => {
+        checkEnvironmentVariables(process.env, ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN']);
+        const gitlabUrl = checkGitConfig();
         inquirer.prompt([
             {
                 type: 'input',
@@ -75,6 +70,8 @@ program
     .command('script')
     .description('为项目生成CI脚本')
     .action(() => {
+        checkEnvironmentVariables(process.env, []);
+        const gitlabUrl = checkGitConfig();
         inquirer.prompt([
             {
                 type: 'input',
@@ -131,6 +128,8 @@ program
     .description('自动配置CI流程')
     .action(() => {
         console.log('欢迎使用CI脚手架..');
+        checkEnvironmentVariables(process.env);
+        const gitlabUrl = checkGitConfig();
         inquirer.prompt([
             {
                 type: 'input',
@@ -193,6 +192,75 @@ program
             console.log('配置完毕！')
             console.log('*****CI流程*****')
             console.log('提交代码->Gitlab通知->Jenkins打包构建镜像->钉钉群通知')            
+        });
+    });
+
+program
+    .command('deploy')
+    .description('创建项目部署清单, 请务必进入k8s-vela-config根目录(非master分支), 再执行此命令')
+    .action(() => {
+        const gitlabUrl = checkGitConfig();
+        if (!gitlabUrl || !gitlabUrl.endsWith('k8s-vela-config.git')) {
+            errorLog('请务必进入k8s-vela-config根目录(非master分支), 再执行此命令');
+            process.exit(1);
+        }
+        checkMasterBranch();
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'namespace',
+                message: '请选择项目所属的命名空间',
+                choices: ['default', 'mediawise', 'video-tracker', 'dmp'],
+                default: 'default',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'imageName',
+                message: '请输入要部署的容器镜像(不允许带下划线)',
+                validate(input, answers) {
+                    return !!input.trim() && input.indexOf('_') === -1;
+                }
+            },
+            {
+                type: 'input',
+                name: 'containerPort',
+                message: '请输入容器要暴露的端口',
+                default: '8081',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'servicePort',
+                message: '请输入项目对公网暴露的端口(可选，需要请向运维申请)',
+            },
+            {
+                type: 'input',
+                name: 'dingtalkCICDWebhook',
+                message: '请输入项目钉钉群CICD机器人的webhook链接',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'phone',
+                message: '请输入你钉钉绑定的手机号',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+        ]).then(async answers => {
+            console.log('正在为你生成部署清单...');
+            const { namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort } = answers;
+            await genCDFiles(gitlabUrl, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort);
+            console.log('配置完毕！')
+            console.log('*****CD流程*****')
+            console.log('根据项目需要修改生成的文件 -> 提交当前分支到Gitlab -> 提交合并到master的MergeRequest请求 -> 联系运维进行评审、部署')
         });
     });
 
