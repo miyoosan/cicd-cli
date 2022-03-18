@@ -1,6 +1,6 @@
 {
   "name": "vcicd-cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "cicd for kubernetes and jenkins",
   "author": "miyoosan",
   "main": "./bin/index.js",
@@ -19,7 +19,7 @@
     "semver": "^7.1.1",
     "xml2js": "^0.4.23"
   },
-  "keywords": ["cicd", "kubernetes"],
+  "keywords": ["cicd", "kubernetes", "jenkins", "JenkinsAPI", "kubevela", "fluxcd", "GitLabAPI", "GitOps"],
   "license": "ISC",
   "repository": {
     "type": "git",
