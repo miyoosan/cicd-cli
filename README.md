@@ -32,3 +32,35 @@ export JENKINS_PASSWORD="xxx"
 
 # source ~/.zshrc
 ```
+
+## 使用帮助
+
+
+```shel
+# 安装工具
+brew install node
+brew install yarn
+yarn global add vcicd-cli
+```
+
+```shel
+# 升级工具版本
+yarn global add vcicd-cli
+```
+
+```shel
+# 查看工具版本
+cicd --version
+```
+
+```shel
+# 自动创建Jenkins任务、绑定Webhook
+# 进入项目根目录
+cicd init
+```
+
+```shel
+# 生成部署清单 (工具版本 >= 0.2.0)
+# 进入k8s-vela-config根目录(非master分支)
+cicd deploy
+```
