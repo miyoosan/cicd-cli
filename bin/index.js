@@ -15,117 +15,8 @@ const program = require('commander');
 program.version(version);
 
 program
-    .command('jenkins')
-    .description('创建Jenkins多分支流水线任务')
-    .action(() => {
-        checkEnvironmentVariables(process.env);
-        const gitlabUrl = checkGitConfig();
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'gitlabUrl',
-                message: '请输入项目的gitlab地址',
-                default: gitlabUrl,
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-        ]).then(async answers => {
-            const { gitlabUrl } = answers;
-            await genJenkinsJob(gitlabUrl);
-        });
-    });
-
-program
-    .command('gitlab')
-    .description('添加webhooks到gitlab仓库')
-    .action(() => {
-        checkEnvironmentVariables(process.env, ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN']);
-        const gitlabUrl = checkGitConfig();
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'gitlabUrl',
-                message: '请输入项目的gitlab地址',
-                default: gitlabUrl,
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-            {
-                type: 'input',
-                name: 'webhook',
-                message: '请输入webhook链接',
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-        ]).then(async answers => {
-            const { gitlabUrl, webhook } = answers;
-            await genGitlabWebhook(gitlabUrl, webhook);
-        });
-    });
-
-program
-    .command('script')
-    .description('为项目生成CI脚本')
-    .action(() => {
-        checkEnvironmentVariables(process.env, []);
-        const gitlabUrl = checkGitConfig();
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'projectRoot',
-                message: '请输入项目所在位置',
-                default: process.cwd(),
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-            {
-                type: 'input',
-                name: 'gitlabUrl',
-                message: '请输入项目的gitlab地址',
-                default: gitlabUrl,
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-            {
-                type: 'list',
-                name: 'lang',
-                message: '请选择项目使用的编程语言',
-                choices: ['javascript', 'java', 'python'],
-                default: 'javascript',
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-            {
-                type: 'input',
-                name: 'dingtalkCICDWebhook',
-                message: '请输入项目钉钉群CICD机器人的webhook链接',
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-            {
-                type: 'input',
-                name: 'phone',
-                message: '请输入你钉钉绑定的手机号',
-                validate(input, answers) {
-                    return !!input.trim();
-                }
-            },
-        ]).then(async answers => {
-            const { lang, projectRoot, dingtalkCICDWebhook, gitlabUrl, phone } = answers;
-            await genCIFiles(lang, projectRoot, dingtalkCICDWebhook, gitlabUrl, phone);
-        });
-    });
-
-program
     .command('init')
-    .description('自动配置CI流程')
+    .description('为项目自动配置CI流程')
     .action(() => {
         console.log('欢迎使用CI脚手架..');
         checkEnvironmentVariables(process.env);
@@ -261,6 +152,115 @@ program
             console.log('配置完毕！')
             console.log('*****CD流程*****')
             console.log('根据项目需要修改生成的文件 -> 提交当前分支到Gitlab -> 提交合并到master的MergeRequest请求 -> 联系运维进行评审、部署')
+        });
+    });
+
+program
+    .command('jenkins')
+    .description('为项目创建Jenkins多分支流水线任务')
+    .action(() => {
+        checkEnvironmentVariables(process.env);
+        const gitlabUrl = checkGitConfig();
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'gitlabUrl',
+                message: '请输入项目的gitlab地址',
+                default: gitlabUrl,
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+        ]).then(async answers => {
+            const { gitlabUrl } = answers;
+            await genJenkinsJob(gitlabUrl);
+        });
+    });
+
+program
+    .command('gitlab')
+    .description('添加webhooks到gitlab仓库')
+    .action(() => {
+        checkEnvironmentVariables(process.env, ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN']);
+        const gitlabUrl = checkGitConfig();
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'gitlabUrl',
+                message: '请输入项目的gitlab地址',
+                default: gitlabUrl,
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'webhook',
+                message: '请输入webhook链接',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+        ]).then(async answers => {
+            const { gitlabUrl, webhook } = answers;
+            await genGitlabWebhook(gitlabUrl, webhook);
+        });
+    });
+
+program
+    .command('script')
+    .description('为项目生成CI脚本')
+    .action(() => {
+        checkEnvironmentVariables(process.env, []);
+        const gitlabUrl = checkGitConfig();
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'projectRoot',
+                message: '请输入项目所在位置',
+                default: process.cwd(),
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'gitlabUrl',
+                message: '请输入项目的gitlab地址',
+                default: gitlabUrl,
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'list',
+                name: 'lang',
+                message: '请选择项目使用的编程语言',
+                choices: ['javascript', 'java', 'python'],
+                default: 'javascript',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'dingtalkCICDWebhook',
+                message: '请输入项目钉钉群CICD机器人的webhook链接',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'input',
+                name: 'phone',
+                message: '请输入你钉钉绑定的手机号',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+        ]).then(async answers => {
+            const { lang, projectRoot, dingtalkCICDWebhook, gitlabUrl, phone } = answers;
+            await genCIFiles(lang, projectRoot, dingtalkCICDWebhook, gitlabUrl, phone);
         });
     });
 
