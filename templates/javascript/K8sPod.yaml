@@ -6,6 +6,17 @@ metadata:
   namespace: jenkins
 spec:
   containers:
+  - image: jenkins/inbound-agent:4.3-4-jdk11
+    imagePullPolicy: IfNotPresent
+    name: jnlp
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
+    workingDir: /home/jenkins/agent
+    resources:
+      requests:
+        cpu: 3096m
+        memory: 2560Mi
   - args:
     - "9999999"
     command:
