@@ -138,8 +138,7 @@ pipeline {
                     }
 
                     sh '''
-                        rm -f ./conf/nginx.conf
-                        cp "./conf/nginx.$GIT_BRANCH.template" ./conf/nginx.conf
+                        cp "./conf/nginx.$GIT_BRANCH.conf" ./conf/nginx.conf
                         cat ./conf/nginx.conf
                         docker build -t ${IMAGE_TAG}  . || exit 1
                         docker login ${ALI_DOCKER_HUB_HOST} -u ${ALI_DOCKER_HUB_USER} -p ${ALI_DOCKER_HUB_PWD} || exit 1
