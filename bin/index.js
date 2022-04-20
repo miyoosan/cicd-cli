@@ -99,6 +99,16 @@ program
         inquirer.prompt([
             {
                 type: 'list',
+                name: 'cluster',
+                message: '请选择部署环境',
+                choices: ['ali-prod', 'ali-test', 'gcp-prod', 'gcp-test'],
+                default: 'ali-prod',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
+                type: 'list',
                 name: 'namespace',
                 message: '请选择项目所属的命名空间',
                 choices: ['default', 'mediawise', 'video-tracker', 'dmp'],
@@ -147,8 +157,8 @@ program
             },
         ]).then(async answers => {
             console.log('正在为你生成部署清单...');
-            const { namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort } = answers;
-            await genCDFiles(gitlabUrl, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort);
+            const { cluster, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort } = answers;
+            await genCDFiles(gitlabUrl, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort, cluster);
             console.log('配置完毕！')
             console.log('*****CD流程*****')
             console.log('根据项目需要修改生成的文件 -> 提交当前分支到Gitlab -> 提交合并到master的MergeRequest请求 -> 联系运维进行评审、部署')

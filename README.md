@@ -65,7 +65,7 @@ cicd init
 ```
 
 ```shel
-# 生成部署清单 (工具版本 >= 0.2.0)
+# 生成部署清单 (工具版本 >= 0.3.0)
 # 进入k8s-vela-config根目录(非master分支)
 cicd deploy
 ```

@@ -1,0 +1,90 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: $projectName$-$envName$
+  namespace: $namespace$
+spec:
+  components:
+    - name: $projectName$-server-$envName$
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
+            kind: Deployment
+            metadata:
+              name: $projectName$-server-$envName$ #示例应用的名称。
+              labels:
+                app: $projectName$
+            spec:
+              selector:
+                matchLabels:
+                  app: $projectName$ # has to match .spec.template.metadata.labels
+              strategy:
+                type: Recreate
+              template:
+                metadata:
+                  labels:
+                    app: $projectName$
+                spec:
+                  terminationGracePeriodSeconds: 10
+                  containers:
+                    - name: $projectName$
+                      image: $imageName$ # {"$imagepolicy": "$namespace$:fluxcd-$projectName$-$envName$"}
+                      ports:
+                        - containerPort: $containerPort$ #需要在服务中暴露该端口。
+                      resources:
+                        limits:
+                          cpu: 400m
+                          memory: 512Mi
+                        requests:
+                          cpu: 10m
+                          memory: 256Mi
+          - apiVersion: v1
+            kind: Service
+            metadata:
+              name: $projectName$-server-$envName$
+              labels:
+                app: $projectName$
+            spec:
+              selector:
+                app: $projectName$
+              ports:
+                - port: $servicePort$
+                  protocol: TCP
+                  targetPort: $containerPort$
+              type: $serviceType$
+              loadBalancerIP: xx.xx.xx.xx
+  policies:
+    - name: multi-env-policy
+      type: env-binding
+      properties:
+        envs:
+          - name: $envName$
+            placement:
+              clusterSelector:
+                name: $clusterName$
+            selector:
+              components:
+                - $projectName$-server-$envName$
+  workflow:
+    steps:
+      - name: deploy-$envName$
+        type: deploy2env
+        properties:
+          policy: multi-env-policy
+          env: $envName$
+      - name: dingtalk-post
+        # 指定步骤类型
+        type: notification
+        properties:
+          dingding:
+            # 钉钉 Webhook 地址，请查看：https://developers.dingtalk.com/document/robots/custom-robot-access
+            url:
+              value: $dingtalkCICDWebhook$
+            message:
+              msgtype: text
+              text:
+                content: $envLabel$:$projectName$部署成功
+              at:
+                atMobiles:
+                  - "$phone$"

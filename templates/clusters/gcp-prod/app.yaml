@@ -32,20 +32,17 @@ spec:
                       image: $imageName$ # {"$imagepolicy": "$namespace$:fluxcd-$projectName$-$envName$"}
                       ports:
                         - containerPort: $containerPort$ #需要在服务中暴露该端口。
-                      # resources:
-                      #   limits:
-                      #     cpu: "1"
-                      #     memory: 2Gi
-                      #   requests:
-                      #     cpu: 200m
-                      #     memory: 512Mi
+                      resources:
+                        limits:
+                          cpu: 400m
+                          memory: 512Mi
+                        requests:
+                          cpu: 10m
+                          memory: 256Mi
           - apiVersion: v1
             kind: Service
             metadata:
               name: $projectName$-server-$envName$
-              $slb$annotations:
-                $slb$service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-bp1qv2vsh2hs7hulimaxz
-                $slb$service.beta.kubernetes.io/alicloud-loadbalancer-force-override-listeners: 'true'
               labels:
                 app: $projectName$
             spec:
@@ -56,6 +53,7 @@ spec:
                   protocol: TCP
                   targetPort: $containerPort$
               type: $serviceType$
+              loadBalancerIP: xx.xx.xx.xx
   policies:
     - name: multi-env-policy
       type: env-binding
@@ -64,7 +62,7 @@ spec:
           - name: $envName$
             placement:
               clusterSelector:
-                name: cluster-ali-$envName$
+                name: $clusterName$
             selector:
               components:
                 - $projectName$-server-$envName$
@@ -86,7 +84,7 @@ spec:
             message:
               msgtype: text
               text:
-                content: $envLabel$环境:$projectName$部署成功
+                content: $envLabel$:$projectName$部署成功
               at:
                 atMobiles:
                   - "$phone$"
