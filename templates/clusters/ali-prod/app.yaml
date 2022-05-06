@@ -30,15 +30,15 @@ spec:
                   containers:
                     - name: $projectName$
                       image: $imageName$ # {"$imagepolicy": "$namespace$:fluxcd-$projectName$-$envName$"}
-                      ports:
-                        - containerPort: $containerPort$ #需要在服务中暴露该端口。
+                      $cpt$ports:
+                        $cpt$- containerPort: $containerPort$ #需要在服务中暴露该端口。
                       resources:
                         limits:
-                          cpu: 400m
-                          memory: 512Mi
+                          cpu: $limitCpu$
+                          memory: $limitMemory$
                         requests:
-                          cpu: 10m
-                          memory: 256Mi
+                          cpu: $requestCpu$
+                          memory: $requestMemory$
           - apiVersion: v1
             kind: Service
             metadata:

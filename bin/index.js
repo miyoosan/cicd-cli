@@ -111,7 +111,7 @@ program
                 type: 'list',
                 name: 'namespace',
                 message: '请选择项目所属的命名空间',
-                choices: ['default', 'mediawise', 'video-tracker', 'dmp'],
+                choices: ['default', 'mediawise', 'video-tracker', 'dmp', 'vddb'],
                 default: 'default',
                 validate(input, answers) {
                     return !!input.trim();
@@ -128,11 +128,11 @@ program
             {
                 type: 'input',
                 name: 'containerPort',
-                message: '请输入容器要暴露的端口',
-                default: '8081',
-                validate(input, answers) {
-                    return !!input.trim();
-                }
+                message: '请输入容器要暴露的端口(可选)',
+                // default: '8081',
+                // validate(input, answers) {
+                //     return !!input.trim();
+                // }
             },
             {
                 type: 'input',
