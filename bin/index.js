@@ -140,6 +140,16 @@ program
                 message: '请输入项目对公网暴露的端口(可选，需要请向运维申请)',
             },
             {
+                type: 'list',
+                name: 'redis',
+                message: '请选择是否需要redis',
+                choices: ['no', 'yes'],
+                default: 'no',
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+            {
                 type: 'input',
                 name: 'dingtalkCICDWebhook',
                 message: '请输入项目钉钉群CICD机器人的webhook链接',
@@ -157,8 +167,8 @@ program
             },
         ]).then(async answers => {
             console.log('正在为你生成部署清单...');
-            const { cluster, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort } = answers;
-            await genCDFiles(gitlabUrl, namespace, imageName, containerPort, dingtalkCICDWebhook, phone, servicePort, cluster);
+            const { cluster, namespace, imageName, containerPort, redis, dingtalkCICDWebhook, phone, servicePort } = answers;
+            await genCDFiles(gitlabUrl, namespace, imageName, containerPort, redis, dingtalkCICDWebhook, phone, servicePort, cluster);
             console.log('配置完毕！')
             console.log('*****CD流程*****')
             console.log('根据项目需要修改生成的文件 -> 提交当前分支到Gitlab -> 提交合并到master的MergeRequest请求 -> 联系运维进行评审、部署')

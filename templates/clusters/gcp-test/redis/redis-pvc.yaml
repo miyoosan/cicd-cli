@@ -1,0 +1,13 @@
+# 华为云好像不支持这种方式的自动创建。可以去控制台的快速文件存储里导入SFS
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: $projectName$-redis-pvc
+  namespace: $namespace$
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: cnfs-nas

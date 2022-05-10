@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: $projectName$-redis-config
+  namespace: $namespace$
+data:
+  redis-config: |
+    maxmemory-policy allkeys-lru
+    appendonly yes
+    appendfilename "appendonly.aof"
+    appendfsync everysec

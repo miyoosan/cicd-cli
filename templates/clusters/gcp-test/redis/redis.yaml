@@ -1,0 +1,107 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: $projectName$-redis-$envName$
+  namespace: $namespace$
+spec:
+  components:
+    - name: $projectName$-redis-$envName$
+      type: k8s-objects
+      properties:
+        objects:
+        - apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: $projectName$-redis-$envName$
+          spec:
+            selector:
+              matchLabels:
+                app: $projectName$-redis-$envName$ # has to match .spec.template.metadata.labels
+            strategy:
+              type: Recreate
+            template:
+              metadata:
+                labels:
+                  app: $projectName$-redis-$envName$
+              spec:
+                terminationGracePeriodSeconds: 10
+                containers:
+                - name: redis
+                  image: redis:5.0.14
+                  resources:
+                    limits:
+                      cpu: 200m
+                      memory: 160Mi
+                    requests:
+                      cpu: 10m
+                      memory: 16Mi
+                  command:
+                  - redis-server
+                  - "/redis-master/redis.conf"
+                  env:
+                  - name: MASTER
+                    value: "true"
+                  ports:
+                    - containerPort: 6379
+                      name: redis
+                  volumeMounts:
+                    - name: redis-pvc
+                      mountPath: /data
+                    - mountPath: /redis-master
+                      name: config
+                volumes:
+                - name: config
+                  configMap:
+                    name: $projectName$-redis-config
+                    items:
+                    - key: redis-config
+                      path: redis.conf
+                - name: redis-pvc
+                  persistentVolumeClaim:
+                    claimName: $projectName$-redis-pvc
+        - apiVersion: v1
+          kind: Service
+          metadata:
+            name: $projectName$-redis-$envName$
+            labels:
+              app: $projectName$-redis-$envName$
+          spec:
+            selector:
+              app: $projectName$-redis-$envName$
+            ports:
+            - port: 6379
+              #protocol: TCP
+              #targetPort: 6379
+            #loadBalancerIP: xx.xx.xx.xx
+  policies:
+    - name: multi-env-policy
+      type: env-binding
+      properties:
+        envs:
+          - name: $envName$
+            placement:
+              clusterSelector:
+                name: $clusterName$
+            selector:
+              components:
+                - $projectName$-redis-$envName$
+  workflow:
+    steps:
+      - name: deploy-$envName$
+        type: deploy2env
+        properties:
+          policy: multi-env-policy
+          env: $envName$
+      - name: dingtalk-post
+        type: notification
+        properties:
+          dingding:
+            url:
+              value: $dingtalkCICDWebhook$
+            message:
+              msgtype: text
+              text:
+                content: $envLabel$:$projectName$-redis-$envName$部署成功redis://$projectName$-redis-$envName$.$namespace$.svc.cluster.local:6379
+              at:
+                atMobiles:
+                  - "$phone$"
