@@ -1,6 +1,6 @@
 {
   "name": "vcicd-cli",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "cicd for kubernetes and jenkins",
   "author": "miyoosan",
   "main": "./bin/index.js",

@@ -52,7 +52,7 @@ pipeline {
                             echo "build-test"
                             sh '''
                                 mvn clean
-                                mvn package -P test
+                                mvn package -P test -s $MAVEN_SETTINGS
                             '''
                         }
                     }
@@ -70,7 +70,7 @@ pipeline {
                             echo "build-uat"
                             sh '''
                                 mvn clean
-                                mvn package -P uat
+                                mvn package -P uat -s $MAVEN_SETTINGS
                             '''
                         }
                     }
@@ -88,7 +88,7 @@ pipeline {
                             echo "build-prod"
                             sh '''
                                 mvn clean
-                                mvn package -P prod
+                                mvn package -P prod -s $MAVEN_SETTINGS
                             '''
                         }
                     }

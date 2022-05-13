@@ -31,6 +31,16 @@ spec:
       name: volume-1
     - mountPath: /home/jenkins/agent
       name: workspace-volume
+    - mountPath: /home/jenkins/settings
+      name: config-volume
+    env:
+      - name: MAVEN_SETTINGS_PATH
+        valueFrom:
+          configMapKeyRef:
+            name: maven-settings
+            key: maven-settings-file-path
+      - name: MAVEN_SETTINGS
+        value: "/home/jenkins/settings/$(MAVEN_SETTINGS_PATH)"
     workingDir: /home/jenkins/agent
   - args:
     - "9999999"
@@ -57,3 +67,6 @@ spec:
       type: ""
   - name: workspace-volume
     emptyDir: {}
+  - name: config-volume
+    configMap:
+      name: maven-settings

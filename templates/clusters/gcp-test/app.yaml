@@ -30,8 +30,8 @@ spec:
                   containers:
                     - name: $projectName$
                       image: $imageName$ # {"$imagepolicy": "$namespace$:fluxcd-$projectName$-$envName$"}
-                      ports:
-                        - containerPort: $containerPort$ #需要在服务中暴露该端口。
+                      $cpt$ports:
+                        $cpt$- containerPort: $containerPort$ #需要在服务中暴露该端口。
                       resources:
                         limits:
                           cpu: 400m
@@ -39,21 +39,21 @@ spec:
                         requests:
                           cpu: 10m
                           memory: 256Mi
-          - apiVersion: v1
-            kind: Service
-            metadata:
-              name: $projectName$-server-$envName$
-              labels:
-                app: $projectName$
-            spec:
-              selector:
-                app: $projectName$
-              ports:
-                - port: $servicePort$
-                  protocol: TCP
-                  targetPort: $containerPort$
-              type: $serviceType$
-              loadBalancerIP: xx.xx.xx.xx
+          $cpt$- apiVersion: v1
+            $cpt$kind: Service
+            $cpt$metadata:
+              $cpt$name: $projectName$-server-$envName$
+              $cpt$labels:
+                $cpt$app: $projectName$
+            $cpt$spec:
+              $cpt$selector:
+                $cpt$app: $projectName$
+              $cpt$ports:
+                $cpt$- port: $servicePort$
+                  $cpt$protocol: TCP
+                  $cpt$targetPort: $containerPort$
+              $cpt$type: $serviceType$
+              $cpt$loadBalancerIP: xx.xx.xx.xx
   policies:
     - name: multi-env-policy
       type: env-binding

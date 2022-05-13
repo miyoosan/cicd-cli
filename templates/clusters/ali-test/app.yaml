@@ -30,8 +30,8 @@ spec:
                   containers:
                     - name: $projectName$
                       image: $imageName$ # {"$imagepolicy": "$namespace$:fluxcd-$projectName$-$envName$"}
-                      ports:
-                        - containerPort: $containerPort$ #需要在服务中暴露该端口。
+                      $cpt$ports:
+                        $cpt$- containerPort: $containerPort$ #需要在服务中暴露该端口。
                       resources:
                         limits:
                           cpu: 400m
@@ -39,23 +39,23 @@ spec:
                         requests:
                           cpu: 10m
                           memory: 256Mi
-          - apiVersion: v1
-            kind: Service
-            metadata:
-              name: $projectName$-server-$envName$
-              $slb$annotations:
-                $slb$service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-bp1qv2vsh2hs7hulimaxz
-                $slb$service.beta.kubernetes.io/alicloud-loadbalancer-force-override-listeners: 'true'
-              labels:
-                app: $projectName$
-            spec:
-              selector:
-                app: $projectName$
-              ports:
-                - port: $servicePort$
-                  protocol: TCP
-                  targetPort: $containerPort$
-              type: $serviceType$
+          $cpt$- apiVersion: v1
+            $cpt$kind: Service
+            $cpt$metadata:
+              $cpt$name: $projectName$-server-$envName$
+              $cpt$$slb$annotations:
+                $cpt$$slb$service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-bp1qv2vsh2hs7hulimaxz
+                $cpt$$slb$service.beta.kubernetes.io/alicloud-loadbalancer-force-override-listeners: 'true'
+              $cpt$labels:
+                $cpt$app: $projectName$
+            $cpt$spec:
+              $cpt$selector:
+                $cpt$app: $projectName$
+              $cpt$ports:
+                $cpt$- port: $servicePort$
+                  $cpt$protocol: TCP
+                  $cpt$targetPort: $containerPort$
+              $cpt$type: $serviceType$
   workflow:
     steps:
       - name: application
