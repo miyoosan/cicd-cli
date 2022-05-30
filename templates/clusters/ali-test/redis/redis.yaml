@@ -18,7 +18,10 @@ spec:
               matchLabels:
                 app: $projectName$-redis-$envName$ # has to match .spec.template.metadata.labels
             strategy:
-              type: Recreate
+              type: RollingUpdate
+              rollingUpdate:
+                maxSurge: 1
+                maxUnavailable: 0
             template:
               metadata:
                 labels:
@@ -35,6 +38,28 @@ spec:
                     requests:
                       cpu: 10m
                       memory: 16Mi
+                  livenessProbe: #存活检测，未存活将被kill
+                    exec:
+                      command:
+                        - redis-cli
+                        - ping
+                        - "|"
+                        - grep
+                        - PONG
+                    initialDelaySeconds: 20 #等待程序启动时间
+                    timeoutSeconds: 3 #检测超时时间
+                    periodSeconds: 60 #检测频率
+                  readinessProbe: #就绪检测，未就绪不接入路由
+                    exec:
+                      command:
+                        - redis-cli
+                        - ping
+                        - "|"
+                        - grep
+                        - PONG
+                    initialDelaySeconds: 0 #等待程序启动时间
+                    timeoutSeconds: 3 #检测超时时间
+                    periodSeconds: 3 #检测频率
                   command:
                   - redis-server
                   - "/redis-master/redis.conf"
