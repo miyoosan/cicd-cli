@@ -3,7 +3,7 @@
 const inquirer = require('inquirer');
 const packageJson = require('../package.json');
 const { checkNodeVersion, checkEnvironmentVariables, checkGitConfig, checkMasterBranch, errorLog } = require('../utils/index');
-const { genCIFiles, genCDFiles, genJenkinsJob, genGitlabWebhook, genDingtalWebhook } = require('../lib/generate');
+const { genCIFiles, genCDFiles, genJenkinsJob, genJenkinsWebhook, genGitlabWebhook, genDingtalWebhook } = require('../lib/generate');
 
 const version = packageJson.version;
 const requiredNodeVersion = packageJson.engines.node;
@@ -194,6 +194,30 @@ program
         ]).then(async answers => {
             const { gitlabUrl } = answers;
             await genJenkinsJob(gitlabUrl);
+        });
+    });
+
+    
+
+program
+    .command('hook')
+    .description('添加Jenkins webhooks到gitlab仓库')
+    .action(() => {
+        checkEnvironmentVariables(process.env, ['GITLAB_URL', 'GITLAB_PRIVATE_TOKEN']);
+        const gitlabUrl = checkGitConfig();
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'gitlabUrl',
+                message: '请输入项目的gitlab地址',
+                default: gitlabUrl,
+                validate(input, answers) {
+                    return !!input.trim();
+                }
+            },
+        ]).then(async answers => {
+            const { gitlabUrl } = answers;
+            await genJenkinsWebhook(gitlabUrl);
         });
     });
 
