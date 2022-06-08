@@ -44,8 +44,9 @@ spec:
             $cpt$metadata:
               $cpt$name: $projectName$-server-$envName$
               $cpt$$slb$annotations:
-                $cpt$$slb$service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-bp1qv2vsh2hs7hulimaxz
+                $cpt$$slb$service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-bp1d4ijo8o75n12smbrs3
                 $cpt$$slb$service.beta.kubernetes.io/alicloud-loadbalancer-force-override-listeners: 'true'
+                $cpt$$slb$service.beta.kubernetes.io/alicloud-loadbalancer-address-type: intranet
               $cpt$labels:
                 $cpt$app: $projectName$
             $cpt$spec:
