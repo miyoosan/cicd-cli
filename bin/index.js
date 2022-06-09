@@ -91,7 +91,8 @@ program
     .description('创建项目部署清单, 请务必进入k8s-vela-config根目录(非master分支), 再执行此命令')
     .action(() => {
         const gitlabUrl = checkGitConfig();
-        if (!gitlabUrl || !gitlabUrl.endsWith('k8s-vela-config.git') || !gitlabUrl.endsWith('k8s-vela-config')) {
+        const isInVelaRepo = gitlabUrl && (gitlabUrl.endsWith('k8s-vela-config.git') || gitlabUrl.endsWith('k8s-vela-config'))
+        if (!isInVelaRepo) {
             errorLog('请务必进入k8s-vela-config根目录(非master分支), 再执行此命令');
             process.exit(1);
         }
