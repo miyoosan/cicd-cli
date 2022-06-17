@@ -57,7 +57,7 @@ spec:
                   $cpt$protocol: TCP
                   $cpt$targetPort: $containerPort$
               $cpt$type: $serviceType$
-              $cpt$loadBalancerIP: xx.xx.xx.xx
+              $slb$$cpt$loadBalancerIP: xx.xx.xx.xx
   policies:
     - name: multi-env-policy
       type: env-binding
